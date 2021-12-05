@@ -1,6 +1,10 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Application {
 
@@ -12,6 +16,12 @@ public class Application {
     String directory = args[0];
 
     Path path = Path.of(directory);
-    Files.walkFileTree(path, new PrintFiles());
+    PrintFiles printFiles = new PrintFiles();
+    Files.walkFileTree(path, printFiles);
+    ArrayList<String> asList = new ArrayList<>(printFiles.getSeenNotificationIds());
+    Collections.shuffle(asList);
+    List<String> sample = asList.subList(0, 501);
+    String ids = sample.stream().collect(Collectors.joining(","));
+    System.out.println("(" + ids + ")");
   }
 }

@@ -9,6 +9,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Base64;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static java.nio.file.FileVisitResult.CONTINUE;
 
@@ -22,16 +23,14 @@ public class PrintFiles extends SimpleFileVisitor<Path> {
       Path fileName = file.getFileName();
       String asString = fileName.toString();
       if (asString.startsWith("cas360-uat-notifications-firehose-stream-to-s3-3")) {
-        byte[] allBytes = Files.readAllBytes(file);
-        String contentsAsString = new String(allBytes);
-        Files.lines(file).forEach(line -> {
-          JSONObject awsResponseJSON = new JSONObject(line);
-          JSONObject notificationDTO = new JSONObject(new String(Base64.getDecoder().decode(awsResponseJSON.getString("rawData"))));
-          String notificationId = notificationDTO.getString("id");
-          seenNotificationIds.add(notificationId);
-        });
-
-        JSONObject jsonObject = new JSONObject(contentsAsString);
+        try (Stream<String> lines = Files.lines(file)) {
+          lines.forEach(line -> {
+            JSONObject awsResponseJSON = new JSONObject(line);
+            JSONObject notificationDTO = new JSONObject(new String(Base64.getDecoder().decode(awsResponseJSON.getString("rawData"))));
+            String notificationId = notificationDTO.getString("id");
+            seenNotificationIds.add(notificationId);
+          });
+        }
         System.out.format("Regular file: %s ", file);
       }
     }

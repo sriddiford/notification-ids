@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Application {
 
@@ -21,7 +20,7 @@ public class Application {
     ArrayList<String> asList = new ArrayList<>(printFiles.getSeenNotificationIds());
     Collections.shuffle(asList);
     List<String> sample = asList.subList(0, 501);
-    String ids = sample.stream().collect(Collectors.joining(","));
+    String ids = String.join(",", sample);
     System.out.println("(" + ids + ")");
   }
 }
